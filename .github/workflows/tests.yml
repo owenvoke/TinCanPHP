@@ -1,0 +1,38 @@
+name: Tests
+
+on: ['push', 'pull_request']
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ['ubuntu-latest']
+        php: ['5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4']
+
+    name: PHP ${{ matrix.php }} - ${{ matrix.os }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        tools: composer
+        coverage: none
+
+    - name: Setup Problem Matches
+      run: |
+        echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+        echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+    - name: Copy CI configuration
+      run: cp tests/config/config.travis-ci.php tests/config/config.php
+
+    - name: Install PHP dependencies
+      run: composer install --no-interaction --no-progress --ansi
+
+    - name: Unit Tests
+      run: vendor/bin/phpunit --colors=always
