@@ -12,6 +12,9 @@ jobs:
 
     name: PHP ${{ matrix.php }} - ${{ matrix.os }}
 
+    env:
+      TRAVIS_BUILD_DIR: ${{ github.workspace }}
+
     steps:
     - name: Checkout
       uses: actions/checkout@v2
